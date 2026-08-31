@@ -443,8 +443,9 @@ export const ActiveTaskActionsOpen: Story = {
   play: async ({ canvasElement }) => {
     const page = within(canvasElement.ownerDocument.body);
     await waitFor(() => expect(page.getByRole('menu')).toBeVisible());
-    expect(page.getByRole('menuitem', { name: '重命名' })).toBeVisible();
-    expect(page.getByRole('menuitem', { name: /^归档$/ })).toBeVisible();
+    expect(page.getByRole('menuitem', { name: '置顶' })).toBeVisible();
+    expect(page.getByRole('menuitem', { name: '归档' })).toBeVisible();
+    expect(page.queryByRole('menuitem', { name: '重命名' })).not.toBeInTheDocument();
     expect(page.queryByRole('menuitem', { name: /删除/ })).toBeNull();
   },
 };
@@ -707,17 +708,21 @@ export const ProjectGroups: Story = {
     const taskActionButton = within(taskRow).getByRole('button', { name: /任务操作$/ });
     taskActionButton.focus();
     await userEvent.keyboard('{Enter}');
-    const renameTask = page.getByRole('menuitem', { name: '重命名' });
-    await expect(renameTask).toBeVisible();
+    const pinTask = page.getByRole('menuitem', { name: '置顶' });
+    await expect(pinTask).toBeVisible();
+    await expect(page.queryByRole('menuitem', { name: '重命名' })).toBeNull();
     const taskAction = taskRow.querySelector<HTMLElement>('.maka-session-row-action');
     if (!taskAction) throw new Error('task action is missing');
     await expect(taskAction).toHaveAttribute(
       'data-menu-open',
       'true',
     );
-    await userEvent.hover(renameTask);
+    await userEvent.hover(pinTask);
     await expect(timestamp).toHaveStyle({ visibility: 'hidden' });
-    await userEvent.click(renameTask);
+    await userEvent.keyboard('{Escape}');
+    await expect(taskActionButton).toHaveFocus();
+    taskControl.focus();
+    await userEvent.keyboard('{F2}');
     await expect(await page.findByRole('dialog', { name: '重命名任务' }, {
       timeout: 5_000,
     })).toBeVisible();

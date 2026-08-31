@@ -72,7 +72,7 @@ import { getConversationCopy } from './conversation-copy.js';
 import { getSessionHoverCardCopy } from './session-hover-card-copy.js';
 import { deriveTitlebarProjectName } from './titlebar-session-identity.js';
 
-type SessionRowActionId = 'flag' | 'archive' | 'rename';
+type SessionRowActionId = 'flag' | 'archive';
 type ProjectRowActionId = 'new' | 'relink' | 'rename' | 'archive' | 'restore';
 type SessionHistoryGroupVariant = 'conversation' | 'project';
 
@@ -834,6 +834,18 @@ const SessionNavRow = memo(function SessionNavRow(props: {
           }
           props.onSelectSession(props.session.id);
         }}
+        onKeyDown={(event) => {
+          if (event.key !== 'F2' || !props.actions) return;
+          event.preventDefault();
+          props.onStartRename(
+            {
+              kind: 'session',
+              id: props.session.id,
+              name: props.session.name,
+            },
+            event.currentTarget,
+          );
+        }}
         endContent={
           // Slot 2. The timestamp is what the row shows at rest; the ⋯ menu
           // below is absolutely positioned over this box and sidebar.css swaps
@@ -887,7 +899,6 @@ const SessionNavRow = memo(function SessionNavRow(props: {
           bulkCount={props.bulkCount}
           bulkAllPinned={props.bulkAllPinned}
           selectionCommands={props.selectionCommands}
-          onStartRename={props.onStartRename}
         />
       )}
     </div>
@@ -1246,9 +1257,7 @@ function SessionItemActions(props: {
   bulkCount: number;
   bulkAllPinned: boolean;
   selectionCommands?: SessionRailSelectionCommands;
-  onStartRename(target: SessionRenameTarget, opener: HTMLElement | null): void;
 }) {
-  const trailingRef = useRef<HTMLSpanElement>(null);
   const locale = useUiLocale();
   const copy = getConversationCopy(locale).sessions;
   const actionContext = [
@@ -1292,7 +1301,6 @@ function SessionItemActions(props: {
     <span
       className="maka-session-row-action"
       data-menu-open={menuOpen ? 'true' : undefined}
-      ref={trailingRef}
       onKeyDown={(event) => event.stopPropagation()}
     >
       <MoreMenu
@@ -1328,22 +1336,6 @@ function SessionItemActions(props: {
                     runRowAction('flag', () =>
                       actions.onToggleFlag(props.session.id, !props.session.isFlagged),
                     ),
-                },
-                {
-                  label: copy.rename,
-                  icon: Pencil,
-                  onClick: () => {
-                    const opener =
-                      trailingRef.current?.querySelector<HTMLElement>('button') ?? null;
-                    props.onStartRename(
-                      {
-                        kind: 'session',
-                        id: props.session.id,
-                        name: props.session.name,
-                      },
-                      opener,
-                    );
-                  },
                 },
                 // Archive is where the rail stops. Deleting is the one row
                 // action that cannot be undone, and the rail is where a

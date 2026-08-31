@@ -53,7 +53,7 @@ async function expectSelected(input: Locator): Promise<void> {
     .toBe(await input.inputValue().then((value) => value.length));
 }
 
-test('rename inputs own native focus for menu and double-click entry', async ({
+test('rename inputs own native focus for keyboard, double-click, and menu entry', async ({
   renameFocusWindow: { page, app },
 }) => {
   await focusWindow(app);
@@ -62,17 +62,14 @@ test('rename inputs own native focus for menu and double-click entry', async ({
 
   const sidebar = page.getByRole('navigation', { name: '任务列表' });
   const rowButton = sidebar.getByRole('button', { name: /^任务 00 / }).first();
-  const row = rowButton.locator('..');
-  const taskActions = sidebar.getByRole('button', { name: /^任务 00 .*任务操作$/ });
 
-  await row.hover();
-  await taskActions.click();
-  await page.getByRole('menuitem', { name: '重命名', exact: true }).click();
-  await sendNativeText(app, 'MENU');
+  await rowButton.focus();
+  await rowButton.press('F2');
+  await sendNativeText(app, 'KEYBOARD');
   const taskInput = page.getByRole('textbox', { name: '重命名任务' });
-  await expect(taskInput).toHaveValue('MENU');
+  await expect(taskInput).toHaveValue('KEYBOARD');
   await page.keyboard.press('Escape');
-  await expect(taskActions).toBeFocused();
+  await expect(rowButton).toBeFocused();
 
   await rowButton.dblclick();
   const doubleClickInput = page.getByRole('textbox', { name: '重命名任务' });

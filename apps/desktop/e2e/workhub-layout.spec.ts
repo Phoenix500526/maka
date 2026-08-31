@@ -84,19 +84,17 @@ test('WorkHub uses its coordination model and shared attachment composer', async
   if (await expandSidebar.isVisible()) await expandSidebar.click();
   const nativeWorkHubVisible = () => mainWindow.evaluate((window) => window.contentView.children.some((child) => 'webContents' in child && (child as Electron.WebContentsView).webContents.getURL().includes('surface=workhub') && child.getVisible()));
   const actions = page.getByRole('button', { name: /Drag task 0.*任务操作$/ });
-  await page.getByRole('button', { name: 'Drag task 0', exact: true }).hover();
-  await actions.click();
-  await expect(page.getByRole('menuitem', { name: '重命名', exact: true })).toBeVisible();
+  const task = page.getByRole('button', { name: 'Drag task 0', exact: true });
+  await task.focus();
+  await task.press('F2');
   await expect.poll(nativeWorkHubVisible).toBe(false);
   await expect(page.locator('.workHubDockBackdrop')).toBeVisible();
-  await page.getByRole('menuitem', { name: '重命名', exact: true }).click();
   await expect(page.getByRole('textbox', { name: '重命名任务' })).toBeVisible();
   await page.keyboard.press('Escape');
   await expect(page.getByRole('textbox', { name: '重命名任务' })).toBeHidden();
-  // Dialog focus restoration can open the action tooltip over the dock.
-  // Exercise that keyboard focus explicitly and dismiss the remaining overlay.
-  await actions.press('Tab');
-  await page.keyboard.press('Shift+Tab');
+  await expect(task).toBeFocused();
+  // Exercise action focus explicitly and dismiss its tooltip overlay.
+  await actions.focus();
   const actionTooltip = page.getByRole('tooltip', { name: 'Drag task 0 任务操作', exact: true });
   await expect(actionTooltip).toBeVisible();
   await expect.poll(nativeWorkHubVisible).toBe(false);
