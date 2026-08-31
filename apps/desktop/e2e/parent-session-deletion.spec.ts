@@ -75,4 +75,16 @@ test('deleting a parent task archives its linked subagent task', async ({
   await expect(archivedTasks.getByText(PARENT_REMOVAL_CHILD_NAME, { exact: true })).toBeVisible();
   await expect(archivedTasks.getByText(/原父任务已删除/)).toBeVisible();
   await expect(archivedTasks.getByText(PARENT_REMOVAL_PARENT_NAME, { exact: true })).toHaveCount(0);
+
+  const unarchive = archivedTasks.getByRole('button', {
+    name: `取消归档「${PARENT_REMOVAL_CHILD_NAME}」`,
+  });
+  const remove = archivedTasks.getByRole('button', {
+    name: `彻底删除「${PARENT_REMOVAL_CHILD_NAME}」`,
+  });
+  await expect(unarchive).toBeVisible();
+  await expect(remove).toBeVisible();
+  await expect(unarchive.locator('svg[aria-hidden="true"]')).toHaveCount(1);
+  await expect(remove.locator('svg[aria-hidden="true"]')).toHaveCount(1);
+  await expect(archivedTasks.getByRole('button', { name: /更多操作/ })).toHaveCount(0);
 });
