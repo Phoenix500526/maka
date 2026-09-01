@@ -22,7 +22,7 @@ import type { UiCatalog, UiLocale } from '@maka/core/ui-locale';
 export type UsageSettingsCopy = {
   saveFailed: string; toolbarAria: string; rangeAria: string; ranges: readonly [string, string, string, string];
   refreshingAria: string; refreshAria: string; summaryAria: string; totalRequests: string; totalCost: string; costHelp: string;
-  totalTokens: string; tokenDetail(input: number, output: number): string; cacheTokens: string; cacheDetail(miss: number, read: number, creation: number): string;
+  totalTokens: string; tokenDetail(input: string, output: string): string; cacheTokens: string; cacheDetail(miss: string, read: string, creation: string): string;
   viewAria: string; tabs: readonly [string, string, string, string, string]; filtersAria: string; filterPlaceholder: string; filterAria: string;
   statusAria: string; statuses: readonly [string, string, string, string]; details: string; detailsAria: string; recordCount(count: number): string; clearFilters: string;
   summaryOnly: string; showDetails: string; filteredEmpty: string; filteredEmptyHelp: string; requestEmpty: string;
