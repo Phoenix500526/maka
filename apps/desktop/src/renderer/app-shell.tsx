@@ -935,7 +935,10 @@ function AppShellContent({
     sessionSettingIntent.overlay.permissionMode,
   );
   const activePermissionMode = activeBoundarySurface.permissionMode;
-  const planMode = usePlanModeState(ownerActiveId ? activeHostSession : undefined);
+  const planMode = usePlanModeState(
+    ownerActiveId ? activeHostSession : undefined,
+    sessionCatalogController,
+  );
   const planConversationItems = (planMode.state?.proposals ?? []).map((proposal) => ({
     id: proposal.proposalId,
     afterTurnId: proposal.turnId,
@@ -1206,14 +1209,13 @@ function AppShellContent({
   useLayoutEffect(() => {
     openSessionInChatRef.current = openSession;
   }, [openSession]);
-  const pendingSessionRowActionsRef = useRef(new Set<string>());
   const sessionNavigationCommandsRef = useRef<SessionNavigationRowActions | null>(null);
   // Built inline: the rail reads these through a ref published on commit, so
   // their identity carries no information and this object never has to be
   // held still by hand (#4109).
   const sessionNavigationPorts: SessionNavigationPorts = {
     sessionsRef,
-    pendingSessionRowActionsRef,
+    acquireAutomaticQueryBlock: sessionCatalogController.acquireAutomaticQueryBlock,
     activateSession: setActiveId,
     clearSessionRendererState,
     refreshSessions,
