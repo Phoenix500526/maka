@@ -30,7 +30,17 @@ import { uiLocaleToIntlLocale } from '@maka/core/ui-locale';
 import { parseDesktopSessionKey } from '../../../../shared/runtime-host-identity.js';
 import type { UsageRange, UsageSettings, UsageStats } from '@maka/core/settings';
 import { estimatedUsageCost, hasUnavailableUsage } from '@maka/core/usage-ledger-merge';
-import { Button, TextInput, Selector, Switch, useToast, useUiLocale, useMountedRef, Banner } from '@maka/ui';
+import {
+  Banner,
+  Button,
+  formatCompactTokenCount,
+  Selector,
+  Switch,
+  TextInput,
+  useMountedRef,
+  useToast,
+  useUiLocale,
+} from '@maka/ui';
 import {
   ICON_SIZE,
   Activity,
@@ -63,6 +73,18 @@ const USAGE_SEARCH_DEBOUNCE_MS = 250;
 const EMPTY_USAGE_LOGS: UsageStats['logs'] = [];
 const normalizeUsageSearch = (search: string) => search.trim().toLowerCase();
 
+function TokenTooltipContent(props: {
+  rows: ReadonlyArray<readonly [label: string, value: string]>;
+}) {
+  return (
+    <div>
+      {props.rows.map(([label, value]) => (
+        <div key={label}>{label}: {value}</div>
+      ))}
+    </div>
+  );
+}
+
 /**
  * The Usage settings surface (issue #4425). A disposable view: it unmounts when
  * the user leaves the Usage section. The loaded stats snapshot lives in the
@@ -80,6 +102,10 @@ export function UsageSettingsView(props: {
   const services = useUsageServices();
   const locale = useUiLocale();
   const copy = getUsageSettingsCopy(locale);
+  const exactTokenFormatter = useMemo(
+    () => new Intl.NumberFormat(uiLocaleToIntlLocale(locale)),
+    [locale],
+  );
   const toast = useToast();
   const persistedUsage = props.settings;
   // A retained complete result stays bound to its original query until replacement.
@@ -284,8 +310,50 @@ export function UsageSettingsView(props: {
         <div className="settingsUsageSummary" role="group" aria-label={copy.summaryAria}>
           <MetricCard title={copy.totalRequests} value={stats ? String(stats.summary.totalRequests) : '—'} />
           <MetricCard title={copy.totalCost} value={totalCostDisplay} detail={copy.costHelp} />
-          <MetricCard title={copy.totalTokens} value={stats ? String(stats.summary.totalTokens) : '—'} detail={stats ? copy.tokenDetail(stats.summary.inputTokens, stats.summary.outputTokens) : undefined} />
-          <MetricCard title={copy.cacheTokens} value={stats ? String(stats.summary.cacheTokens) : '—'} detail={stats ? copy.cacheDetail(stats.summary.cacheMiss, stats.summary.cacheRead, stats.summary.cacheCreation) : undefined} />
+          <MetricCard
+            title={copy.totalTokens}
+            value={stats ? (
+              <Tooltip
+                content={(
+                  <TokenTooltipContent rows={[
+                    [copy.tokenTooltip.total, exactTokenFormatter.format(stats.summary.totalTokens)],
+                    [copy.tokenTooltip.input, exactTokenFormatter.format(stats.summary.inputTokens)],
+                    [copy.tokenTooltip.output, exactTokenFormatter.format(stats.summary.outputTokens)],
+                  ]} />
+                )}
+                hasHoverIndication={false}
+              >
+                {formatCompactTokenCount(stats.summary.totalTokens)}
+              </Tooltip>
+            ) : '—'}
+            detail={stats ? copy.tokenDetail(
+              formatCompactTokenCount(stats.summary.inputTokens),
+              formatCompactTokenCount(stats.summary.outputTokens),
+            ) : undefined}
+          />
+          <MetricCard
+            title={copy.cacheTokens}
+            value={stats ? (
+              <Tooltip
+                content={(
+                  <TokenTooltipContent rows={[
+                    [copy.tokenTooltip.cached, exactTokenFormatter.format(stats.summary.cacheTokens)],
+                    [copy.tokenTooltip.new, exactTokenFormatter.format(stats.summary.cacheMiss)],
+                    [copy.tokenTooltip.hit, exactTokenFormatter.format(stats.summary.cacheRead)],
+                    [copy.tokenTooltip.created, exactTokenFormatter.format(stats.summary.cacheCreation)],
+                  ]} />
+                )}
+                hasHoverIndication={false}
+              >
+                {formatCompactTokenCount(stats.summary.cacheTokens)}
+              </Tooltip>
+            ) : '—'}
+            detail={stats ? copy.cacheDetail(
+              formatCompactTokenCount(stats.summary.cacheMiss),
+              formatCompactTokenCount(stats.summary.cacheRead),
+              formatCompactTokenCount(stats.summary.cacheCreation),
+            ) : undefined}
+          />
         </div>
       </div>
 
