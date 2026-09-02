@@ -300,7 +300,7 @@ function InspectorOverview(props: {
             kind: segment.kind,
             label: copy.tokenUsage.segment[segment.kind],
             swatch: `token-${segment.kind}`,
-            value: `${formatCompactNumber(segment.tokens)} · ${formatPercent(
+            value: `${formatCompactTokenCount(segment.tokens)} · ${formatPercent(
               segment.tokens / tokenUsage.total,
             )}`,
           }))}
