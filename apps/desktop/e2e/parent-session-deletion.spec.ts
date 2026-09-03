@@ -56,12 +56,11 @@ test('deleting a parent task archives its linked subagent task', async ({
   await page.getByRole('button', { name: '已归档任务', exact: true }).click();
   const archivedTasks = page.getByRole('main', { name: '设置内容' });
 
-  await archivedTasks
-    .getByRole('button', { name: `「${PARENT_REMOVAL_PARENT_NAME}」的更多操作` })
-    .click();
   // 彻底删除, not 删除: Settings names the irreversible verb in full, which is
   // the point of routing every deletion through a surface reached by archiving.
-  await page.getByRole('menuitem', { name: '彻底删除', exact: true }).click();
+  await archivedTasks
+    .getByRole('button', { name: `彻底删除「${PARENT_REMOVAL_PARENT_NAME}」`, exact: true })
+    .click();
   const confirm = page.getByRole('alertdialog', {
     name: `删除 "${PARENT_REMOVAL_PARENT_NAME}"`,
   });
