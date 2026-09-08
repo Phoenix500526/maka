@@ -56,11 +56,14 @@ function TokenTooltipContent(props: {
   rows: ReadonlyArray<readonly [label: string, value: string]>;
 }) {
   return (
-    <div>
+    <dl style={{ margin: 0 }}>
       {props.rows.map(([label, value]) => (
-        <div key={label}>{label}: {value}</div>
+        <div key={label} style={{ display: 'flex', justifyContent: 'space-between', gap: '1em' }}>
+          <dt>{label}</dt>
+          <dd style={{ margin: 0 }}>{value}</dd>
+        </div>
       ))}
-    </div>
+    </dl>
   );
 }
 
@@ -222,7 +225,6 @@ export function UsageSettingsView(props: {
                     [copy.tokenTooltip.output, exactTokenFormatter.format(stats.summary.outputTokens)],
                   ]} />
                 )}
-                hasHoverIndication={false}
               >
                 {formatCompactTokenCount(stats.summary.totalTokens)}
               </Tooltip>
@@ -244,7 +246,6 @@ export function UsageSettingsView(props: {
                     [copy.tokenTooltip.created, exactTokenFormatter.format(stats.summary.cacheCreation)],
                   ]} />
                 )}
-                hasHoverIndication={false}
               >
                 {formatCompactTokenCount(stats.summary.cacheTokens)}
               </Tooltip>

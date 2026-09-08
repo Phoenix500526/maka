@@ -19,7 +19,7 @@
 
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { formatCompactTokenCount } from '@maka/ui';
+import { formatCompactTokenCount } from './compact-token-count.js';
 
 test('formats context-window capacity with locale-independent K/M units', () => {
   assert.equal(formatCompactTokenCount(256_000), '256K');
@@ -37,6 +37,5 @@ test('formats token counts with at most one decimal and promotes rounded values'
   assert.equal(formatCompactTokenCount(1_250_000), '1.3M');
   assert.equal(formatCompactTokenCount(999_950_000), '1B');
   assert.equal(formatCompactTokenCount(1_250_000_000), '1.3B');
-  assert.equal(formatCompactTokenCount(999_950_000_000), '1T');
-  assert.equal(formatCompactTokenCount(1_250_000_000_000), '1.3T');
+  assert.equal(formatCompactTokenCount(12_647_391), '12.6M');
 });

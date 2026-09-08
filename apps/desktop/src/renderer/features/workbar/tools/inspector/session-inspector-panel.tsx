@@ -357,7 +357,6 @@ function InspectorOverview(props: {
         <InspectorContextSection
           copy={copy}
           context={context}
-          formatCompactNumber={formatCompactTokenCount}
           formatNumber={formatNumber}
         />
       )}
@@ -626,10 +625,9 @@ function FactRow(props: {
 function InspectorContextSection(props: {
   copy: InspectorCopy;
   context: NonNullable<ReturnType<typeof deriveInspectorOverviewModel>['context']>;
-  formatCompactNumber: (value: number) => string;
   formatNumber: (value: number) => string;
 }) {
-  const { context, copy, formatCompactNumber, formatNumber } = props;
+  const { context, copy, formatNumber } = props;
   const level = context.ratio >= 0.9 ? 'error' : context.ratio >= 0.7 ? 'warning' : undefined;
 
   return (
@@ -639,7 +637,7 @@ function InspectorContextSection(props: {
           {copy.overview.context}
         </Heading>
         <span className="maka-inspector-section-readout">
-          {formatCompactNumber(context.usedTokens)} / {formatCompactNumber(context.windowTokens)} ·{' '}
+          {formatCompactTokenCount(context.usedTokens)} / {formatCompactTokenCount(context.windowTokens)} ·{' '}
           {formatPercent(context.ratio)}
         </span>
       </div>
