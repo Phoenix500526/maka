@@ -22,19 +22,9 @@ import type { PermissionMode } from '@maka/core/permission';
 import type { SessionBlockedReason, SessionStatus } from '@maka/core/session';
 import type { ThinkingLevel } from '@maka/core/model-thinking';
 import type { UiCatalog, UiLocale } from '@maka/core/ui-locale';
+import { formatCompactTokenCount } from './compact-token-count.js';
 
 export type DayPeriod = 'morning' | 'noon' | 'afternoon' | 'evening';
-
-/** Compact token count: 999 → "999", 45,200 → "45.2k", 128,000 → "128k", 1,048,576 → "1M". */
-function formatCompactTokenCount(count: number): string {
-  if (count < 1_000) return `${count}`;
-  if (count >= 1_000_000) {
-    const millions = count / 1_000_000;
-    return `${millions >= 100 ? Math.round(millions) : Math.round(millions * 10) / 10}M`;
-  }
-  const thousands = count / 1_000;
-  return `${thousands >= 100 ? Math.round(thousands) : Math.round(thousands * 10) / 10}k`;
-}
 
 /** Wall-clock units per locale (zh uses words, en letters); each copy entry supplies its own. */
 interface DurationUnits {
@@ -359,7 +349,7 @@ export interface ConversationCopy {
     resumeGoal: (condition: string, iteration: number, max: number) => string;
     /** Wall-clock elapsed label for the goal chip, e.g. "12m". */
     goalElapsed: (elapsedMs: number) => string;
-    /** Token usage label for the goal chip when a budget exists, e.g. "12k / 100k". */
+    /** Token usage label for the goal chip when a budget exists, e.g. "12K / 100K". */
     goalTokens: (spent: number, budget: number) => string;
     loadFailed: string;
     loading: string;
