@@ -46,6 +46,7 @@ import { useUsageServices, useUsageStats } from '../services-context.js';
 type UsageActiveTab = UsageSettings['activeTab'];
 
 const USAGE_REQUESTS_PAGE_SIZE = 50;
+const EMPTY_USAGE_LOGS: UsageStats['logs'] = [];
 
 /**
  * The Usage settings surface (issue #4425). A disposable view: it unmounts when
@@ -73,7 +74,6 @@ export function UsageSettingsView(props: {
   // panels read `null` (loading/empty) rather than the previous range's numbers.
   const { stats, reload, targetKey } = useUsageStats(persistedUsage.range);
   const [refreshing, setRefreshing] = useState(false);
-  const [usageRefreshRevision, setUsageRefreshRevision] = useState(0);
   const usageRefreshGuard = useActionGuard<'refresh'>();
   const {
     draft: usageDraft,
@@ -132,7 +132,6 @@ export function UsageSettingsView(props: {
 
   async function refresh() {
     if (!usageRefreshGuard.begin('refresh')) return;
-    setUsageRefreshRevision((revision) => revision + 1);
     setRefreshing(true);
     try {
       await reload(usageDraftRef.current.range);
@@ -216,8 +215,7 @@ export function UsageSettingsView(props: {
         {usageDraft.activeTab === 'requests' ? (
           <div className="settingsUsageTabPanel">
             <UsageRequestsPanel
-              key={`${usageDraft.range}:${usageRefreshRevision}`}
-              logs={showRequestDetails ? filteredLogs : []}
+              logs={showRequestDetails ? filteredLogs : EMPTY_USAGE_LOGS}
               showDetails={usageDraft.showDetails}
               modelFilter={usageDraft.modelFilter}
               status={usageDraft.status}
@@ -312,10 +310,7 @@ function UsageRequestsPanel(props: {
         <div className="settingsUsageModelFilter">
           <TextInput
             value={props.modelFilter}
-            onChange={(value) => {
-              setPage(1);
-              props.onModelFilterChange(value);
-            }}
+            onChange={props.onModelFilterChange}
             placeholder={props.copy.filterPlaceholder}
             label={props.copy.filterAria}
             isLabelHidden
@@ -334,7 +329,6 @@ function UsageRequestsPanel(props: {
           ]}
           width={320}
           onChange={(value) => {
-            setPage(1);
             props.onStatusChange(value as UsageSettings['status']);
           }}
         />
@@ -357,10 +351,7 @@ function UsageRequestsPanel(props: {
           tabIndex={!props.hasRequestFilters ? -1 : undefined}
           onClick={
             props.hasRequestFilters
-              ? () => {
-                  setPage(1);
-                  props.onClearFilters();
-                }
+              ? props.onClearFilters
               : undefined
           }
           label={props.copy.clearFilters}
@@ -400,10 +391,7 @@ function UsageRequestsPanel(props: {
               variant="ghost"
               size="sm"
               label={props.copy.clearFilters}
-              onClick={() => {
-                setPage(1);
-                props.onClearFilters();
-              }}
+              onClick={props.onClearFilters}
             />
           ) : undefined,
         }}
