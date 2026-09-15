@@ -59,20 +59,20 @@ test('context usage explains missing data without exposing provider internals', 
 test('context usage tooltip leads with the measured share', () => {
   assert.equal(
     getConversationCopy('zh-CN').messages.systemNotes.contextUsageShare(12_345, 128_000),
-    '上下文窗口：已用 10%（12.3k / 128k token）',
+    '上下文窗口：已用 10%（12.3K / 128K token）',
   );
   assert.equal(
     getConversationCopy('en').messages.systemNotes.contextUsageShare(12_345, 128_000),
-    'Context window: 10% used (12.3k / 128k tokens).',
+    'Context window: 10% used (12.3K / 128K tokens).',
   );
   // Million-scale windows collapse to the M tier, mirroring the "1M context" marketing term.
   assert.equal(
     getConversationCopy('zh-CN').messages.systemNotes.contextUsageShare(44_060, 1_048_576),
-    '上下文窗口：已用 4%（44.1k / 1M token）',
+    '上下文窗口：已用 4%（44.1K / 1M token）',
   );
   assert.equal(
     getConversationCopy('en').messages.systemNotes.contextUsageShare(44_060, 1_048_576),
-    'Context window: 4% used (44.1k / 1M tokens).',
+    'Context window: 4% used (44.1K / 1M tokens).',
   );
   // Compact counts are lossy: near-full usage can render identical numerator
   // and denominator while the percentage still differs. Pinned on purpose —
@@ -86,11 +86,11 @@ test('context usage tooltip leads with the measured share', () => {
 test('context usage tooltip keeps measured usage when the limit is unknown', () => {
   assert.equal(
     getConversationCopy('zh-CN').messages.systemNotes.contextUsageNoWindow(12_345),
-    '已用 12.3k token；上下文窗口上限未知',
+    '已用 12.3K token；上下文窗口上限未知',
   );
   assert.equal(
     getConversationCopy('en').messages.systemNotes.contextUsageNoWindow(12_345),
-    'This request used 12.3k tokens; no context limit is available for this model.',
+    'This request used 12.3K tokens; no context limit is available for this model.',
   );
 });
 
