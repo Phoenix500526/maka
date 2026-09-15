@@ -61,11 +61,11 @@ function TokenTooltipContent(props: {
   rows: ReadonlyArray<readonly [label: string, value: string]>;
 }) {
   return (
-    <dl style={{ margin: 0 }}>
+    <dl className="settingsUsageTokenTooltip">
       {props.rows.map(([label, value]) => (
-        <div key={label} style={{ display: 'flex', justifyContent: 'space-between', gap: '1em' }}>
+        <div key={label}>
           <dt>{label}</dt>
-          <dd style={{ margin: 0 }}>{value}</dd>
+          <dd>{value}</dd>
         </div>
       ))}
     </dl>
