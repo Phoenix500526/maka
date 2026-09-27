@@ -311,7 +311,10 @@ export function UsageSettingsView(props: {
         </div>
 
         <div className="settingsUsageSummary" role="group" aria-label={copy.summaryAria}>
-          <MetricCard title={copy.totalRequests} value={stats ? String(stats.summary.totalRequests) : '—'} />
+          <MetricCard
+            title={copy.totalRequests}
+            value={stats ? formatCompactTokenCount(stats.summary.totalRequests) : '—'}
+          />
           <MetricCard title={copy.totalCost} value={totalCostDisplay} detail={copy.costHelp} />
           <MetricCard
             title={copy.totalTokens}
@@ -686,7 +689,12 @@ function UsageProvidersPanel(props: { stats: UsageStats | null; copy: UsageSetti
         { header: props.copy.tables.providerHeaders[2], numeric: true },
         { header: props.copy.tables.providerHeaders[3], numeric: true },
       ]}
-      rows={(props.stats?.byProvider ?? []).map((row) => [row.provider, row.requests, row.tokens, `$${row.costUsd.toFixed(2)}`])}
+      rows={(props.stats?.byProvider ?? []).map((row) => [
+        row.provider,
+        row.requests,
+        formatCompactTokenCount(row.tokens),
+        `$${row.costUsd.toFixed(2)}`,
+      ])}
       empty={{ Icon: Database, title: props.copy.tables.providerEmptyTitle, body: props.copy.tables.providerEmptyBody }}
     />
   );
@@ -702,7 +710,12 @@ function UsageModelsPanel(props: { stats: UsageStats | null; copy: UsageSettings
         { header: props.copy.tables.modelHeaders[2], numeric: true },
         { header: props.copy.tables.modelHeaders[3], numeric: true },
       ]}
-      rows={(props.stats?.byModel ?? []).map((row) => [row.model, row.requests, row.tokens, `$${row.costUsd.toFixed(2)}`])}
+      rows={(props.stats?.byModel ?? []).map((row) => [
+        row.model,
+        row.requests,
+        formatCompactTokenCount(row.tokens),
+        `$${row.costUsd.toFixed(2)}`,
+      ])}
       empty={{ Icon: Cpu, title: props.copy.tables.modelEmptyTitle, body: props.copy.tables.modelEmptyBody }}
     />
   );
